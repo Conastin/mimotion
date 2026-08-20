@@ -302,7 +302,8 @@ def push_to_dingtalk_webhook(exec_results, summary, config: PushConfig):
     """推送到钉钉"""
     # 判断是否需要钉钉推送
     if config.dingtalk_webhook_token and config.dingtalk_webhook_token != '' and config.dingtalk_webhook_token != 'NO':
-        content = f'**{summary}**'
+        # summary带有前导换行，会导致**加粗标记被换行拆开无法渲染，先strip
+        content = f'**{summary.strip()}**'
         if len(exec_results) >= config.push_plus_max:
             content += '\n\n- 账号数量过多，详细情况请前往github actions中查看'
         else:

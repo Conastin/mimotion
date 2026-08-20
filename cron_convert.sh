@@ -57,6 +57,35 @@ function hours_except_now {
   echo "$result"
 }
 
+# 在[min_hour, max_hour]（UTC）范围内随机抽取count个互不重复的小时，exclude_hour用于剔除当前小时
+function random_hours {
+  local count=$1
+  local min_hour=$2
+  local max_hour=$3
+  local exclude_hour=$4
+  local candidates=()
+  local h
+  for ((h = min_hour; h <= max_hour; h++)); do
+    if [ "$h" != "$exclude_hour" ]; then
+      candidates+=("$h")
+    fi
+  done
+  local n=${#candidates[@]}
+  if [ "$count" -gt "$n" ]; then
+    count=$n
+  fi
+  # Fisher-Yates洗牌后取前count个
+  local i j tmp
+  for ((i = n - 1; i > 0; i--)); do
+    j=$((RANDOM % (i + 1)))
+    tmp=${candidates[i]}
+    candidates[i]=${candidates[j]}
+    candidates[j]=$tmp
+  done
+  local picked=("${candidates[@]:0:count}")
+  printf '%s\n' "${picked[@]}" | sort -n | paste -sd ','
+}
+
 function convert_utc_to_shanghai {
   local cron_str=$1
   echo "UTC时间: ${cron_str}"
@@ -78,6 +107,7 @@ function convert_utc_to_shanghai {
 function persist_execute_log {
   local event_name=$1
   local new_cron_hours=$2
+  local random_count=${3:-6}
   echo "trigger by: ${event_name}" > cron_change_time
   {
     echo "current system time:"
@@ -97,7 +127,13 @@ function persist_execute_log {
   current_cron=$(< .github/workflows/run.yml grep cron|awk '{print substr($0, index($0,$3))}')
   cron_hours=$(inspect_hours "$current_cron")
   if test -n "$new_cron_hours"; then
+    # 配置了CRON_HOURS时使用配置的小时，并剔除当前小时避免同小时重复执行
     cron_hours=$(hours_except_now "$new_cron_hours")
+  else
+    # 未配置CRON_HOURS时，每天在北京时间8-22点(UTC 0-14)窗口内随机抽取执行小时，执行时间不固定
+    exclude_hour=$(TZ=UTC date '+%H')
+    exclude_hour=$((10#$exclude_hour))
+    cron_hours=$(random_hours "$random_count" 0 14 "$exclude_hour")
   fi
   "${sed_prefix[@]}" -E "s/(- cron: ')[0-9]+( [^[:space:]]+ \* \* \*')/\1$((RANDOM % 59)) ${cron_hours} * * *'/g" .github/workflows/run.yml
   current_cron=$(< .github/workflows/run.yml grep cron|awk '{print substr($0, index($0,$3))}')

@@ -188,10 +188,17 @@ class MiMotionRunner:
         if app_token is None:
             return "登陆失败！", False
 
-        step = str(random.randint(min_step, max_step))
-        self.log_str += f"已设置为随机步数范围({min_step}~{max_step}) 随机值:{step}\n"
-        
+        # 同一天内步数只增不减，模拟真实步数累积：以当日已提交的步数为随机下界，跨天自动重置
+        today = time.strftime("%F")
         user_token_info = user_tokens.get(self.user, {})
+        last_step = user_token_info.get("last_step", 0) if user_token_info.get("step_date") == today else 0
+        step_min = max(min_step, last_step)
+        step_max = max(max_step, step_min)
+        step = str(random.randint(step_min, step_max))
+        if last_step > 0:
+            self.log_str += f"今日已提交步数:{last_step} "
+        self.log_str += f"已设置为随机步数范围({step_min}~{step_max}) 随机值:{step}\n"
+
         bound_device_id = user_token_info.get("bound_device_id")
         if not bound_device_id and self.user_id:
             bound_device_id = zeppHelper.get_user_device_id(app_token, self.user_id)
@@ -201,6 +208,10 @@ class MiMotionRunner:
                 self.log_str += f"查找到已绑定设备ID: {bound_device_id}\n"
 
         ok, msg = zeppHelper.post_fake_brand_data(step, app_token, self.user_id, device_id=bound_device_id)
+        if ok:
+            user_token_info["last_step"] = int(step)
+            user_token_info["step_date"] = today
+            user_tokens[self.user] = user_token_info
         return f"修改步数（{step}）[" + msg + "]", ok
 
 
