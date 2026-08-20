@@ -1,22 +1,11 @@
 trigger by: workflow_dispatch
 current system time:
-UTC: 26-08-20 05:22:49
-北京时间: 26-08-20 13:22:49
+UTC: 26-08-20 05:32:56
+北京时间: 26-08-20 13:32:56
 current cron:
-UTC时间: '2 0,3,6,7,13,14 * * *'
-random cron
-          source cron_convert.sh
--m "[${current}] random cron trigger by ${{ github.event_name }}" || echo "nothing to commit"
-北京时间: '2
-random
-source
--m 8,11,14,15,21,22,8,8,8 * * *'
-next cron:
 UTC时间: '50 0,1,4,7,13,14 * * *'
-random cron
-          source cron_convert.sh
--m "[${current}] random cron trigger by ${{ github.event_name }}" || echo "nothing to commit"
-北京时间: '50
-random
-source
--m 8,9,12,15,21,22,8,8,8 * * *'
+北京时间: '50 8,9,12,15,21,22 * * *'
+next cron:
+UTC时间: '10 1,6,7,9,11,12 * * *'
+北京时间: '10 9,14,15,17,19,20 * * *'
+next exec time: UTC(6:10) 北京时间(14:10)
