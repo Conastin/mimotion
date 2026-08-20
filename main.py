@@ -320,6 +320,8 @@ if __name__ == "__main__":
             "PUSH_WECHAT_WEBHOOK_KEY": os.environ.get("PUSH_WECHAT_WEBHOOK_KEY", ""),
             "TELEGRAM_BOT_TOKEN": os.environ.get("TELEGRAM_BOT_TOKEN", ""),
             "TELEGRAM_CHAT_ID": os.environ.get("TELEGRAM_CHAT_ID", ""),
+            "DINGTALK_WEBHOOK_TOKEN": os.environ.get("DINGTALK_WEBHOOK_TOKEN", ""),
+            "DINGTALK_WEBHOOK_SECRET": os.environ.get("DINGTALK_WEBHOOK_SECRET", ""),
             "SLEEP_GAP": os.environ.get("SLEEP_GAP", "5"),
             "USE_CONCURRENT": os.environ.get("USE_CONCURRENT", "False")
         }
@@ -335,7 +337,9 @@ if __name__ == "__main__":
         push_plus_max=get_int_value_default(config, 'PUSH_PLUS_MAX', 30),
         push_wechat_webhook_key=config.get('PUSH_WECHAT_WEBHOOK_KEY'),
         telegram_bot_token=config.get('TELEGRAM_BOT_TOKEN'),
-        telegram_chat_id=config.get('TELEGRAM_CHAT_ID')
+        telegram_chat_id=config.get('TELEGRAM_CHAT_ID'),
+        dingtalk_webhook_token=config.get('DINGTALK_WEBHOOK_TOKEN'),
+        dingtalk_webhook_secret=config.get('DINGTALK_WEBHOOK_SECRET')
     )
     sleep_seconds = config.get('SLEEP_GAP')
     if sleep_seconds is None or sleep_seconds == '':

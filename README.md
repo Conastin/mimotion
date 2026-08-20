@@ -85,6 +85,8 @@
     "PUSH_PLUS_HOUR": "",
     "PUSH_PLUS_MAX": "30",
     "PUSH_WECHAT_WEBHOOK_KEY": "",
+    "DINGTALK_WEBHOOK_TOKEN": "",
+    "DINGTALK_WEBHOOK_SECRET": "",
     "TELEGRAM_BOT_TOKEN": "",
     "TELEGRAM_CHAT_ID": "",
     "SLEEP_GAP": "5",
@@ -101,6 +103,8 @@
   | PUSH_PLUS_TOKEN         | 推送加的个人token,申请地址[pushplus](https://www.pushplus.plus/push1.html)，工作流执行完成后推送每个账号的执行状态信息，如没有则不要填写                |
   | PUSH_PLUS_HOUR          | 限制只在某个整点进行pushplus的推送，值为整数，比如设置21，则只在北京时间21点XX分执行时才进行pushplus的消息推送。如不设置或值非数字则每次执行后都会进行推送                       |
   | PUSH_WECHAT_WEBHOOK_KEY | 企业微信推送通知的key，企业微信webhook机器人推送全地址为：https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={机器人的key}，这里配置{机器人的key} |
+| DINGTALK_WEBHOOK_TOKEN | 钉钉推送通知的token，在钉钉群中添加自定义机器人后，Webhook地址形如：https://oapi.dingtalk.com/robot/send?access_token={机器人的token}，这里配置{机器人的token}，也支持直接粘贴完整的Webhook地址 |
+| DINGTALK_WEBHOOK_SECRET | 钉钉机器人安全设置为加签时对应的密钥，以SEC开头。如果机器人安全设置使用的是自定义关键词或IP白名单，则无需配置。注意使用自定义关键词时，请保证关键词包含在推送标题或内容中（标题固定包含"刷步数"字样，推荐关键词直接填写：刷步数） |
   | PUSH_PLUS_MAX           | 设置pushplus最大推送账号详情数，默认为30，超过30个账号将只推送概要信息：多少个成功多少个失败。因为数量太多会导致内容过长无法推送。具体最大值请自行调试                              |
   | TELEGRAM_BOT_TOKEN      | 设置telegram机器人的token，同时需要配置TELEGRAM_CHAT_ID，否则不会执行推送                                                            |
   | TELEGRAM_CHAT_ID        | 设置telegram的chatId，需要同时配置TELEGRAM_BOT_TOKEN，否则无法执行推送。关于这两个值如何获取，请前往官网查看。                                        |
@@ -185,7 +189,8 @@
 - 步骤：
   - 首先配置Secrets：`INSPECT_WECHAT_HOOK_KEY` 配置企业微信机器人的key，具体请参考企业微信机器人文档。
   - telegram配置Secrets：`INSPECT_TELEGRAM_BOT_TOKEN`和`INSPECT_TELEGRAM_CHAT_ID` 配置机器人的token和聊天chatId，具体请参考TelegramBot文档。
-  - 然后点击Actions，左侧选择 `提取配置信息` 手动运行它，运行成功后，将配置信息发送到企业微信或telegram中。企业微信或者telegram的推送自己按需选择，如果都不配置，请使用日志打印的方式。
+  - 钉钉配置Secrets：`INSPECT_DINGTALK_WEBHOOK_TOKEN` 配置钉钉群自定义机器人的access_token（或完整Webhook地址），如果机器人开启了加签，还需要配置`INSPECT_DINGTALK_WEBHOOK_SECRET`（SEC开头的密钥）。
+  - 然后点击Actions，左侧选择 `提取配置信息` 手动运行它，运行成功后，将配置信息发送到企业微信、钉钉或telegram中。企业微信、钉钉或者telegram的推送自己按需选择，如果都不配置，请使用日志打印的方式。
 - 如果没有企业微信或telegram，可以配置Secrets: `INSPECT_AES_KEY` 注意是16位的字符串，请勿使用弱密码，避免被人猜到。
   - 在Secrets中配置后，运行上述的Actions，然后在执行结果中查看日志打印的base64字符串。
   - 提取base64字符串后，可以使用在线AES加解密网站进行解密，加密方式为CBC，填充方式为PKCS7，密钥长度128bit，密钥和偏移量（iv）均为INSPECT_AES_KEY

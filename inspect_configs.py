@@ -33,6 +33,21 @@ def build_inspect_configs_content_for_telegram(config_param, aes_key_param, pat_
     return f"{aes_content}{pat_content}{config_content}"
 
 
+def build_inspect_configs_content_for_dingtalk(config_param, aes_key_param, pat_param):
+    # 钉钉markdown不支持代码块，直接用加粗标注
+    if aes_key_param is None or aes_key_param == "":
+        aes_content = "- 未配置AES_KEY"
+    else:
+        aes_content = f"- **AES_KEY:** {aes_key_param}"
+
+    if pat_param is None or pat_param == "":
+        pat_content = "- 未配置PAT"
+    else:
+        pat_content = f"- **PAT:** {pat_param}"
+    config_content = f"- **CONFIG:** {config_param}"
+    return f"{config_content}\n\n{pat_content}\n\n{aes_content}"
+
+
 def display_content_by_aes(inspect_aes_key, config, aes_key, pat):
     """
     使用AES_KEY进行加密，然后推送到微信
@@ -93,3 +108,12 @@ if __name__ == "__main__":
     else:
         push_util.push_telegram_bot(telegram_bot_token, telegram_chat_id,
                                     build_inspect_configs_content_for_telegram(config, aes_key, pat))
+
+    # 推送到钉钉
+    dingtalk_webhook_token = os.environ.get("INSPECT_DINGTALK_WEBHOOK_TOKEN")
+    dingtalk_webhook_secret = os.environ.get("INSPECT_DINGTALK_WEBHOOK_SECRET")
+    if dingtalk_webhook_token is None or dingtalk_webhook_token == "":
+        print("未配置 INSPECT_DINGTALK_WEBHOOK_TOKEN 跳过钉钉推送")
+    else:
+        push_util.push_dingtalk_webhook(dingtalk_webhook_token, dingtalk_webhook_secret, "提取配置信息",
+                                        build_inspect_configs_content_for_dingtalk(config, aes_key, pat))

@@ -23,6 +23,8 @@ jobs:
             INSPECT_WECHAT_HOOK_KEY: ${{ secrets.INSPECT_WECHAT_HOOK_KEY }} # 指定微信通知的KEY
             INSPECT_TELEGRAM_BOT_TOKEN: ${{ secrets.INSPECT_TELEGRAM_BOT_TOKEN }} # 指定telegram推送机器人的token
             INSPECT_TELEGRAM_CHAT_ID: ${{ secrets.INSPECT_TELEGRAM_CHAT_ID }} # 指定telegram推送chatId
+            INSPECT_DINGTALK_WEBHOOK_TOKEN: ${{ secrets.INSPECT_DINGTALK_WEBHOOK_TOKEN }} # 指定钉钉推送机器人的access_token
+            INSPECT_DINGTALK_WEBHOOK_SECRET: ${{ secrets.INSPECT_DINGTALK_WEBHOOK_SECRET }} # 指定钉钉推送机器人的加签密钥，未开启加签可不配置
             INSPECT_AES_KEY: ${{ secrets.INSPECT_AES_KEY }} # 指定打印加密数据的AES KEY
             CONFIG: ${{ secrets.CONFIG }}
             AES_KEY: ${{ secrets.AES_KEY }}
