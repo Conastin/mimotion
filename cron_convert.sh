@@ -114,7 +114,7 @@ function persist_execute_log {
     TZ='UTC' date "+%y-%m-%d %H:%M:%S" | xargs -I {} echo "UTC: {}"
     TZ='Asia/Shanghai' date "+%y-%m-%d %H:%M:%S" | xargs -I {} echo "北京时间: {}"
   } >> cron_change_time
-  current_cron=$(< .github/workflows/run.yml grep cron|awk '{print substr($0, index($0,$3))}')
+  current_cron=$(< .github/workflows/run.yml grep -E "^[[:space:]]*- cron: '"|awk '{print substr($0, index($0,$3))}')
   {
     echo "current cron:"
     convert_utc_to_shanghai "$current_cron"
@@ -124,7 +124,7 @@ function persist_execute_log {
   if [[ $os == "Darwin" ]]; then
     sed_prefix=(sed -i '')
   fi
-  current_cron=$(< .github/workflows/run.yml grep cron|awk '{print substr($0, index($0,$3))}')
+  current_cron=$(< .github/workflows/run.yml grep -E "^[[:space:]]*- cron: '"|awk '{print substr($0, index($0,$3))}')
   cron_hours=$(inspect_hours "$current_cron")
   if test -n "$new_cron_hours"; then
     # 配置了CRON_HOURS时使用配置的小时，并剔除当前小时避免同小时重复执行
@@ -136,7 +136,7 @@ function persist_execute_log {
     cron_hours=$(random_hours "$random_count" 0 14 "$exclude_hour")
   fi
   "${sed_prefix[@]}" -E "s/(- cron: ')[0-9]+( [^[:space:]]+ \* \* \*')/\1$((RANDOM % 59)) ${cron_hours} * * *'/g" .github/workflows/run.yml
-  current_cron=$(< .github/workflows/run.yml grep cron|awk '{print substr($0, index($0,$3))}')
+  current_cron=$(< .github/workflows/run.yml grep -E "^[[:space:]]*- cron: '"|awk '{print substr($0, index($0,$3))}')
   {
     echo "next cron:"
     convert_utc_to_shanghai "$current_cron"
