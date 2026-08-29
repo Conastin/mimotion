@@ -184,7 +184,7 @@ class MiMotionRunner:
             return "登陆失败！", False
 
         # 同一天内步数只增不减，模拟真实步数累积：以当日已提交的步数为随机下界，跨天自动重置
-        today = time.strftime("%F")
+        today = get_beijing_time().strftime("%F")
         user_token_info = user_tokens.get(self.user, {})
         last_step = user_token_info.get("last_step", 0) if user_token_info.get("step_date") == today else 0
         step_min = max(min_step, last_step)
